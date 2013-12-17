@@ -36,13 +36,13 @@
 
 + (instancetype)digest;
 
-- (void)updateWithBytes:(const void *)bytes length:(NSUInteger)length;
-- (void)updateWithData:(NSData *)data;
-- (void)updateWithString:(NSString *)string;
-- (void)updateWithString:(NSString *)string encoding:(NSStringEncoding)encoding normalize:(BOOL)normalize;
-- (void)updateWithDigest:(NRDigest *)digest;
-//- (void)updateWithPropertyList:(id)plist;
-//- (void)updateWithContentsOfFile:(NSString *)filepath;
+- (void)feedBytes:(const void *)bytes length:(NSUInteger)length;
+- (void)feedData:(NSData *)data;
+- (void)feedString:(NSString *)string;
+- (void)feedString:(NSString *)string encoding:(NSStringEncoding)encoding normalize:(BOOL)normalize;
+- (void)feedDigest:(NRDigest *)digest;
+//- (void)feedPropertyList:(id)plist;
+//- (void)feedContentsOfFile:(NSString *)filepath;
 
 + (Class)defaultDigestClass;
 + (void)setDefaultDigestClass:(Class)defaultDigestClass;

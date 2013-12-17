@@ -223,7 +223,7 @@ NR_CONSTANT_DIGEST(32) // 256 bit key: NRConstant32ByteDigest
 	__builtin_unreachable();
 }
 
-__unsafe_unretained Class _defaultDigestClass;
+static __unsafe_unretained Class _defaultDigestClass;
 
 + (Class)defaultDigestClass
 {
@@ -251,23 +251,23 @@ __unsafe_unretained Class _defaultDigestClass;
 	return self;
 }
 
-- (void)updateWithBytes:(const void *)bytes length:(NSUInteger)length
+- (void)feedBytes:(const void *)bytes length:(NSUInteger)length
 {
 	// must be implemented by subclasses
 	[self doesNotRecognizeSelector:_cmd];
 }
 
-- (void)updateWithData:(NSData *)data
+- (void)feedData:(NSData *)data
 {
-	[self updateWithBytes:[data bytes] length:[data length]];
+	[self feedBytes:[data bytes] length:[data length]];
 }
 
-- (void)updateWithString:(NSString *)string
+- (void)feedString:(NSString *)string
 {
-	[self updateWithString:string encoding:NSUnicodeStringEncoding normalize:NO];
+	[self feedString:string encoding:NSUnicodeStringEncoding normalize:NO];
 }
 
-- (void)updateWithString:(NSString *)string encoding:(NSStringEncoding)encoding normalize:(BOOL)normalize
+- (void)feedString:(NSString *)string encoding:(NSStringEncoding)encoding normalize:(BOOL)normalize
 {
 	if (string == nil)
 		return;
@@ -278,18 +278,18 @@ __unsafe_unretained Class _defaultDigestClass;
 	if (encoding == NSUnicodeStringEncoding) {
 		const UniChar *characters = CFStringGetCharactersPtr((__bridge CFStringRef)string);
 		if (characters != NULL) {
-			[self updateWithBytes:characters length:(NSUInteger)CFStringGetLength((__bridge CFStringRef)string)];
+			[self feedBytes:characters length:(NSUInteger)CFStringGetLength((__bridge CFStringRef)string)];
 			return;
 		}
 	}
 
-	[self updateWithData:[string dataUsingEncoding:encoding]];
+	[self feedData:[string dataUsingEncoding:encoding]];
 }
 
-- (void)updateWithDigest:(NRDigest *)digest
+- (void)feedDigest:(NRDigest *)digest
 {
 	NRDigest *immutableDigest = [digest copy];
-	[self updateWithBytes:[immutableDigest bytes] length:[immutableDigest digestSize]];
+	[self feedBytes:[immutableDigest bytes] length:[immutableDigest digestSize]];
 }
 
 - (void)digestDidChange
@@ -357,7 +357,7 @@ __unsafe_unretained Class _defaultDigestClass;
 	return CC_MD5_DIGEST_LENGTH;
 }
 
-- (id)initWithPrototype:(NRMutableMD5Digest *)prototype
+- (id)initWithPrototype:(NRMutableDigest *)prototype
 {
 	self = [super initWithPrototype:prototype];
 	if (self == nil)
@@ -366,13 +366,13 @@ __unsafe_unretained Class _defaultDigestClass;
 	if (prototype == nil) {
 		CC_MD5_Init(&_md5State);
 	} else {
-		_md5State = prototype->_md5State;
+		_md5State = ((NRMutableMD5Digest *)prototype)->_md5State;
 	}
 
 	return self;
 }
 
-- (void)updateWithBytes:(const void *)bytes length:(NSUInteger)length
+- (void)feedBytes:(const void *)bytes length:(NSUInteger)length
 {
 	if (length == 0)
 		return;
@@ -405,7 +405,7 @@ __unsafe_unretained Class _defaultDigestClass;
 	return CC_SHA1_DIGEST_LENGTH;
 }
 
-- (id)initWithPrototype:(NRMutableSHA1Digest *)prototype
+- (id)initWithPrototype:(NRMutableDigest *)prototype
 {
 	self = [super initWithPrototype:prototype];
 	if (self == nil)
@@ -414,13 +414,13 @@ __unsafe_unretained Class _defaultDigestClass;
 	if (prototype == nil) {
 		CC_SHA1_Init(&_sha1State);
 	} else {
-		_sha1State = prototype->_sha1State;
+		_sha1State = ((NRMutableSHA1Digest *)prototype)->_sha1State;
 	}
 
 	return self;
 }
 
-- (void)updateWithBytes:(const void *)bytes length:(NSUInteger)length
+- (void)feedBytes:(const void *)bytes length:(NSUInteger)length
 {
 	if (length == 0)
 		return;
