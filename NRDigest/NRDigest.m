@@ -377,7 +377,7 @@ __unsafe_unretained Class _defaultDigestClass;
 	if (length == 0)
 		return;
 
-	CC_MD5_Update(&_md5State, bytes, length);
+	CC_MD5_Update(&_md5State, bytes, (CC_LONG)length);
 	[self digestDidChange];
 }
 
@@ -425,7 +425,7 @@ __unsafe_unretained Class _defaultDigestClass;
 	if (length == 0)
 		return;
 
-	CC_SHA1_Update(&_sha1State, bytes, length);
+	CC_SHA1_Update(&_sha1State, bytes, (CC_LONG)length);
 	[self digestDidChange];
 }
 
