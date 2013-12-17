@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define NR_UNAVAILABLE(msg) __attribute__((availability(macosx,unavailable,message=msg),availability(ios,unavailable, message=msg)))
+#define NR_UNAVAILABLE(msg) __attribute__((unavailable(msg)))
 
 
 
