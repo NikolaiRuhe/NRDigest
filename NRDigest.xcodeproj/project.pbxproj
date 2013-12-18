@@ -12,7 +12,6 @@
 		91355B701855C6A60040BE36 /* NRDigest.m in Sources */ = {isa = PBXBuildFile; fileRef = 91355B6F1855C6A60040BE36 /* NRDigest.m */; };
 		91355B771855C6A60040BE36 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91355B761855C6A60040BE36 /* XCTest.framework */; };
 		91355B781855C6A60040BE36 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91355B681855C6A60040BE36 /* Foundation.framework */; };
-		91355B7A1855C6A60040BE36 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91355B791855C6A60040BE36 /* UIKit.framework */; };
 		91355B7D1855C6A60040BE36 /* libNRDigest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 91355B651855C6A60040BE36 /* libNRDigest.a */; };
 		91355B831855C6A60040BE36 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 91355B811855C6A60040BE36 /* InfoPlist.strings */; };
 		91355B851855C6A60040BE36 /* NRDigestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 91355B841855C6A60040BE36 /* NRDigestTests.m */; };
@@ -48,7 +47,6 @@
 		91355B6F1855C6A60040BE36 /* NRDigest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NRDigest.m; sourceTree = "<group>"; };
 		91355B751855C6A60040BE36 /* NRDigestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NRDigestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		91355B761855C6A60040BE36 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		91355B791855C6A60040BE36 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		91355B801855C6A60040BE36 /* NRDigestTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NRDigestTests-Info.plist"; sourceTree = "<group>"; };
 		91355B821855C6A60040BE36 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		91355B841855C6A60040BE36 /* NRDigestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NRDigestTests.m; sourceTree = "<group>"; };
@@ -68,7 +66,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				91355B771855C6A60040BE36 /* XCTest.framework in Frameworks */,
-				91355B7A1855C6A60040BE36 /* UIKit.framework in Frameworks */,
 				91355B781855C6A60040BE36 /* Foundation.framework in Frameworks */,
 				91355B7D1855C6A60040BE36 /* libNRDigest.a in Frameworks */,
 			);
@@ -101,7 +98,6 @@
 			children = (
 				91355B681855C6A60040BE36 /* Foundation.framework */,
 				91355B761855C6A60040BE36 /* XCTest.framework */,
-				91355B791855C6A60040BE36 /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -311,6 +307,12 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				WARNING_CFLAGS = (
+					"-Weverything",
+					"-Wno-direct-ivar-access",
+					"-Wno-auto-import",
+					"-Wno-missing-noreturn",
+				);
 			};
 			name = Debug;
 		};
@@ -372,6 +374,12 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Weverything",
+					"-Wno-direct-ivar-access",
+					"-Wno-auto-import",
+					"-Wno-missing-noreturn",
+				);
 			};
 			name = Release;
 		};
@@ -448,6 +456,7 @@
 				91355B8A1855C6A60040BE36 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		91355B8B1855C6A60040BE36 /* Build configuration list for PBXNativeTarget "NRDigestTests" */ = {
 			isa = XCConfigurationList;
@@ -456,6 +465,7 @@
 				91355B8D1855C6A60040BE36 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
