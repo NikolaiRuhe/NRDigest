@@ -1,3 +1,7 @@
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+#pragma clang diagnostic ignored "-Wpadded"
+
 //
 // SpookyHash: a 128-bit noncryptographic hash function
 // By Bob Jenkins, public domain
@@ -297,3 +301,4 @@ private:
 
 
 
+#pragma clang diagnostic pop

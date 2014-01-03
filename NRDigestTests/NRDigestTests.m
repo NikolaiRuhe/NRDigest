@@ -116,4 +116,24 @@
 	XCTAssertEqualObjects(digest1, digest2, @"digests should match");
 }
 
+bool SpookyV2TestResults();
+bool SpookyV2TestAlignment();
+bool SpookyV2TestPieces();
+bool SpookyV2TestDeltas(int seed);
+
+- (void)testSpookyV2Results
+{
+	XCTAssertTrue(SpookyV2TestResults(), @"spooky implementation error");
+}
+
+- (void)testSpookyV2Alignment
+{
+	XCTAssertTrue(SpookyV2TestAlignment(), @"spooky implementation error");
+}
+
+- (void)testSpookyV2Pieces
+{
+	XCTAssertTrue(SpookyV2TestPieces(), @"spooky implementation error");
+}
+
 @end

@@ -1,7 +1,23 @@
 #include "SpookyV2.h"
 #include <stdio.h>
 #include <stddef.h>
-#include <windows.h>
+//#include <windows.h>
+
+#include <string.h>
+#include <stdlib.h>
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wformat"
+static inline uint64 GetTickCount() { return 0; }
+extern "C" {
+    bool SpookyV2TestResults();
+    bool SpookyV2TestAlignment();
+    bool SpookyV2TestPieces();
+    void SpookyV2DoTimingBig(int seed);
+    void SpookyV2DoTimingSmall(int seed);
+    bool SpookyV2TestDeltas(int seed);
+}
 
 class Random
 { 
@@ -52,7 +68,7 @@ static void Add(const void *data, size_t length, uint64 *hash1, uint64 *hash2)
 }
 
 #define BUFSIZE (512)
-void TestResults()
+bool SpookyV2TestResults()
 {
     printf("\ntesting results ...\n");
     static const uint64 expected[BUFSIZE] = {
@@ -138,15 +154,17 @@ void TestResults()
         if (saw[i] != expected[i])
         {
   	    printf("%3d: saw 0x%.8lx, expected 0x%.8lx\n", i, saw[i], expected[i]);
+	    return false;
         }
     }
+    return true;
 }
 #undef BUFSIZE
 
 
 #define NUMBUF (1<<10)
 #define BUFSIZE (1<<20)
-void DoTimingBig(int seed)
+void SpookyV2DoTimingBig(int seed)
 {
     printf("\ntesting time to hash 2^^30 bytes ...\n");
 
@@ -203,7 +221,7 @@ void DoTimingBig(int seed)
 
 #define BUFSIZE (1<<14)
 #define NUMITER 10000000
-void DoTimingSmall(int seed)
+void SpookyV2DoTimingSmall(int seed)
 {
     printf("\ntesting timing of hashing up to %d cached aligned bytes %d times ...\n",
            BUFSIZE, NUMITER);
@@ -231,7 +249,7 @@ void DoTimingSmall(int seed)
 #undef BUFSIZE
 
 #define BUFSIZE 1024
-void TestAlignment()
+bool SpookyV2TestAlignment()
 {
     printf("\ntesting alignment ...\n");
 
@@ -254,9 +272,11 @@ void TestAlignment()
             if (hash[0] != hash[j])
             {
                 printf("alignment problems: %d %d\n", i, j);
+		return false;
             }
         }
     }
+    return true;
 }
 #undef BUFSIZE
 
@@ -264,7 +284,7 @@ void TestAlignment()
 #define BUFSIZE 256
 #define TRIES 50
 #define MEASURES 6
-void TestDeltas(int seed)
+bool SpookyV2TestDeltas(int seed)
 {
     printf("\nall 1 or 2 bit input deltas get %d tries to flip every output bit ...\n", TRIES);
 
@@ -330,6 +350,7 @@ void TestDeltas(int seed)
                 if (k == TRIES)
                 {
                     printf("failed %d %d %d\n", h, i, j);
+		    return false;
                 }
                 else if (k > maxk)
                 {
@@ -339,6 +360,7 @@ void TestDeltas(int seed)
         }
         printf("passed for buffer size %d  max %d\n", h, maxk);
     }
+    return true;
 }
 #undef BUFSIZE
 #undef TRIES
@@ -347,7 +369,7 @@ void TestDeltas(int seed)
 
 // test that hashing pieces has the same behavior as hashing the whole
 #define BUFSIZE 1024
-void TestPieces()
+bool SpookyV2TestPieces()
 {
     printf("\ntesting pieces ...\n");
     char buf[BUFSIZE];
@@ -375,10 +397,12 @@ void TestPieces()
         if (a != c)
         {
             printf("wrong a %d: %.16llx %.16llx\n", i, a,c);
+	    return false;
         }
         if (b != d)
         {
             printf("wrong b %d: %.16llx %.16llx\n", i, b,d);
+	    return false;
         }
 
         // all possible two consecutive pieces
@@ -393,22 +417,25 @@ void TestPieces()
             if (a != c)
             {
                 printf("wrong a %d %d: %.16llx %.16llx\n", j, i, a,c);
+		return false;
             }
             if (b != d)
             {
                 printf("wrong b %d %d: %.16llx %.16llx\n", j, i, b,d);
+		return false;
             }
         }
     }
+    return true;
 }
 #undef BUFSIZE
 
 int main(int argc, const char **argv)
 {
-    TestResults();
-    TestAlignment();
-    TestPieces();
-    DoTimingBig(argc);
-    DoTimingSmall(argc);
-    TestDeltas(argc);
+    SpookyV2TestResults();
+    SpookyV2TestAlignment();
+    SpookyV2TestPieces();
+    SpookyV2DoTimingBig(argc);
+    SpookyV2DoTimingSmall(argc);
+    SpookyV2TestDeltas(argc);
 }

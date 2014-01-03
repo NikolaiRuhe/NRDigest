@@ -1,3 +1,10 @@
+#pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+#pragma clang diagnostic ignored "-Wunreachable-code"
+#pragma clang diagnostic ignored "-Wimplicit-fallthrough"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wconversion"
+
+
 // Spooky Hash
 // A 128-bit noncryptographic hash, for checksums and table lookup
 // By Bob Jenkins.  Public domain.

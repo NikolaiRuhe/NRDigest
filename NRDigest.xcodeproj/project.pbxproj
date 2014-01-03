@@ -15,6 +15,8 @@
 		91355B7D1855C6A60040BE36 /* libNRDigest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 91355B651855C6A60040BE36 /* libNRDigest.a */; };
 		91355B831855C6A60040BE36 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 91355B811855C6A60040BE36 /* InfoPlist.strings */; };
 		91355B851855C6A60040BE36 /* NRDigestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 91355B841855C6A60040BE36 /* NRDigestTests.m */; };
+		918792911876C32700B13AF0 /* TestSpookyV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 918792901876C32700B13AF0 /* TestSpookyV2.cpp */; };
+		918792941876C33100B13AF0 /* SpookyV2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 918792921876C33100B13AF0 /* SpookyV2.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +52,9 @@
 		91355B801855C6A60040BE36 /* NRDigestTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NRDigestTests-Info.plist"; sourceTree = "<group>"; };
 		91355B821855C6A60040BE36 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		91355B841855C6A60040BE36 /* NRDigestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NRDigestTests.m; sourceTree = "<group>"; };
+		918792901876C32700B13AF0 /* TestSpookyV2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestSpookyV2.cpp; sourceTree = "<group>"; tabWidth = 8; };
+		918792921876C33100B13AF0 /* SpookyV2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpookyV2.cpp; sourceTree = "<group>"; };
+		918792931876C33100B13AF0 /* SpookyV2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpookyV2.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +112,8 @@
 			children = (
 				91355B6D1855C6A60040BE36 /* NRDigest.h */,
 				91355B6F1855C6A60040BE36 /* NRDigest.m */,
+				918792931876C33100B13AF0 /* SpookyV2.h */,
+				918792921876C33100B13AF0 /* SpookyV2.cpp */,
 			);
 			path = NRDigest;
 			sourceTree = "<group>";
@@ -115,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				91355B841855C6A60040BE36 /* NRDigestTests.m */,
+				918792901876C32700B13AF0 /* TestSpookyV2.cpp */,
 				91355B7F1855C6A60040BE36 /* Supporting Files */,
 			);
 			path = NRDigestTests;
@@ -210,6 +218,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				918792941876C33100B13AF0 /* SpookyV2.cpp in Sources */,
 				91355B701855C6A60040BE36 /* NRDigest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -218,6 +227,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				918792911876C32700B13AF0 /* TestSpookyV2.cpp in Sources */,
 				91355B851855C6A60040BE36 /* NRDigestTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
