@@ -6,6 +6,9 @@
 //  Copyright (c) 2013 Nikolai Ruhe. All rights reserved.
 //
 
+#pragma clang diagnostic ignored "-Wgnu"
+#pragma clang diagnostic ignored "-Wunused-exception-parameter"
+
 #import <XCTest/XCTest.h>
 #import "NRDigest.h"
 
