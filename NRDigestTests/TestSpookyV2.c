@@ -1,63 +1,61 @@
-#include "SpookyV2.h"
+#include "NRSpookyV2.h"
 #include <stdio.h>
 #include <stddef.h>
 //#include <windows.h>
 
+#include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wconversion"
 #pragma clang diagnostic ignored "-Wsign-conversion"
 #pragma clang diagnostic ignored "-Wformat"
-static inline uint64 GetTickCount() { return 0; }
-extern "C" {
-    bool SpookyV2TestResults();
-    bool SpookyV2TestAlignment();
-    bool SpookyV2TestPieces();
-    void SpookyV2DoTimingBig(int seed);
-    void SpookyV2DoTimingSmall(int seed);
-    bool SpookyV2TestDeltas(int seed);
-}
+static inline uint64_t GetTickCount() { return 0; }
 
-class Random
-{ 
-public:
-    inline uint64 Value()
-    {
-        uint64 e = m_a - Rot64(m_b, 23);
-        m_a = m_b ^ Rot64(m_c, 16);
-        m_b = m_c + Rot64(m_d, 11);
-        m_c = m_d + e;
-        m_d = e + m_a;
-        return m_d;
-    }
+bool SpookyV2TestResults();
+bool SpookyV2TestAlignment();
+bool SpookyV2TestPieces();
+void SpookyV2DoTimingBig(int seed);
+void SpookyV2DoTimingSmall(int seed);
+bool SpookyV2TestDeltas(int seed);
 
-    inline void Init( uint64 seed)
-    {
-        m_a = 0xdeadbeef; 
-        m_b = m_c = m_d = seed;
-        for (int i=0; i<20; ++i) 
-            (void)Value();
-    }
-
-private:
-    static inline uint64 Rot64(uint64 x, int k)
-    {
-        return (x << k) | (x >> (64-(k)));
-    }
-    
-    uint64 m_a; 
-    uint64 m_b; 
-    uint64 m_c; 
-    uint64 m_d;
+struct RandomContext {
+    uint64_t m_a;
+    uint64_t m_b;
+    uint64_t m_c;
+    uint64_t m_d;
 };
 
-// fastest conceivable hash function (for comparison)
-static void Add(const void *data, size_t length, uint64 *hash1, uint64 *hash2)
+static inline uint64_t RandomRot64(uint64_t x, int k)
 {
-    uint64 *p64 = (uint64 *)data;
-    uint64 *end = p64 + length/8;
-    uint64 hash = *hash1 + *hash2;
+    return (x << k) | (x >> (64-(k)));
+}
+
+static inline uint64_t RandomValue(struct RandomContext *randomContext)
+{
+    uint64_t e = randomContext->m_a - RandomRot64(randomContext->m_b, 23);
+    randomContext->m_a = randomContext->m_b ^ RandomRot64(randomContext->m_c, 16);
+    randomContext->m_b = randomContext->m_c + RandomRot64(randomContext->m_d, 11);
+    randomContext->m_c = randomContext->m_d + e;
+    randomContext->m_d = e + randomContext->m_a;
+    return randomContext->m_d;
+}
+
+static inline void RandomInit(struct RandomContext *randomContext, uint64_t seed)
+{
+    randomContext->m_a = 0xdeadbeef;
+    randomContext->m_b = randomContext->m_c = randomContext->m_d = seed;
+    for (int i=0; i<20; ++i) 
+	(void)RandomValue(randomContext);
+}
+
+
+// fastest conceivable hash function (for comparison)
+static void Add(const void *data, size_t length, uint64_t *hash1, uint64_t *hash2)
+{
+    uint64_t *p64 = (uint64_t *)data;
+    uint64_t *end = p64 + length/8;
+    uint64_t hash = *hash1 + *hash2;
     while (p64 < end)
     {
       hash += *p64;
@@ -71,7 +69,7 @@ static void Add(const void *data, size_t length, uint64 *hash1, uint64 *hash2)
 bool SpookyV2TestResults()
 {
     printf("\ntesting results ...\n");
-    static const uint64 expected[BUFSIZE] = {
+    static const uint64_t expected[BUFSIZE] = {
       0x6bf50919,0x70de1d26,0xa2b37298,0x35bc5fbf,0x8223b279,0x5bcb315e,0x53fe88a1,0xf9f1a233,
       0xee193982,0x54f86f29,0xc8772d36,0x9ed60886,0x5f23d1da,0x1ed9f474,0xf2ef0c89,0x83ec01f9,
       0xf274736c,0x7e9ac0df,0xc7aed250,0xb1015811,0xe23470f5,0x48ac20c4,0xe2ab3cd5,0x608f8363,
@@ -145,12 +143,12 @@ bool SpookyV2TestResults()
       0x27c2e04b,0x0b7523bd,0x07305776,0xc6be7503,0x918fa7c9,0xaf2e2cd9,0x82046f8e,0xcc1c8250
     };
  
-    uint8 buf[BUFSIZE];
-    uint32 saw[BUFSIZE];
+    uint8_t buf[BUFSIZE];
+    uint32_t saw[BUFSIZE];
     for (int i=0; i<BUFSIZE; ++i)
     {
         buf[i] = i+128;
-        saw[i] = SpookyHash::Hash32(buf, i, 0);
+        saw[i] = SpookyV2Hash32(buf, i, 0);
         if (saw[i] != expected[i])
         {
   	    printf("%3d: saw 0x%.8lx, expected 0x%.8lx\n", i, saw[i], expected[i]);
@@ -175,18 +173,18 @@ void SpookyV2DoTimingBig(int seed)
         memset(buf[i], (char)seed, BUFSIZE);
     }
     
-    uint64 a = GetTickCount();
-    uint64 hash1 = seed;
-    uint64 hash2 = seed;
-    for (uint64 i=0; i<NUMBUF; ++i)
+    uint64_t a = GetTickCount();
+    uint64_t hash1 = seed;
+    uint64_t hash2 = seed;
+    for (uint64_t i=0; i<NUMBUF; ++i)
     {
-	SpookyHash::Hash128(buf[i], BUFSIZE, &hash1, &hash2);
+	SpookyV2Hash128(buf[i], BUFSIZE, &hash1, &hash2);
     }
-    uint64 z = GetTickCount();
-    printf("SpookyHash::Hash128, uncached: time is %4lld milliseconds\n", z-a);
+    uint64_t z = GetTickCount();
+    printf("SpookyV2Hash128, uncached: time is %4lld milliseconds\n", z-a);
 
     a = GetTickCount();
-    for (uint64 i=0; i<NUMBUF; ++i)
+    for (uint64_t i=0; i<NUMBUF; ++i)
     {
 	Add(buf[i], BUFSIZE, &hash1, &hash2);
     }
@@ -194,15 +192,15 @@ void SpookyV2DoTimingBig(int seed)
     printf("Addition           , uncached: time is %4lld milliseconds\n", z-a);
     
     a = GetTickCount();
-    for (uint64 i=0; i<NUMBUF*BUFSIZE/1024; ++i)
+    for (uint64_t i=0; i<NUMBUF*BUFSIZE/1024; ++i)
     {
-	SpookyHash::Hash128(buf[0], 1024, &hash1, &hash2);
+	SpookyV2Hash128(buf[0], 1024, &hash1, &hash2);
     }
     z = GetTickCount();
-    printf("SpookyHash::Hash128,   cached: time is %4lld milliseconds\n", z-a);
+    printf("SpookyV2Hash128,   cached: time is %4lld milliseconds\n", z-a);
     
     a = GetTickCount();
-    for (uint64 i=0; i<NUMBUF*BUFSIZE/1024; ++i)
+    for (uint64_t i=0; i<NUMBUF*BUFSIZE/1024; ++i)
     {
 	Add(buf[0], 1024, &hash1, &hash2);
     }
@@ -226,7 +224,7 @@ void SpookyV2DoTimingSmall(int seed)
     printf("\ntesting timing of hashing up to %d cached aligned bytes %d times ...\n",
            BUFSIZE, NUMITER);
 
-    uint64 buf[BUFSIZE/8];
+    uint64_t buf[BUFSIZE/8];
     for (int i=0; i<BUFSIZE/8; ++i)
     {
         buf[i] = i+seed;
@@ -234,14 +232,14 @@ void SpookyV2DoTimingSmall(int seed)
     
     for (int i=1; i <= BUFSIZE; i <<= 1)
     {
-        uint64 a = GetTickCount();
-        uint64 hash1 = seed;
-        uint64 hash2 = seed+i;
+        uint64_t a = GetTickCount();
+        uint64_t hash1 = seed;
+        uint64_t hash2 = seed+i;
         for (int j=0; j<NUMITER; ++j)
         {
-            SpookyHash::Hash128((char *)buf, i, &hash1, &hash2);
+            SpookyV2Hash128((char *)buf, i, &hash1, &hash2);
         }
-        uint64 z = GetTickCount();
+        uint64_t z = GetTickCount();
         printf("%d bytes: hash is %.16llx %.16llx, time is %lld\n", 
                i, hash1, hash2, z-a);
     }
@@ -254,7 +252,7 @@ bool SpookyV2TestAlignment()
     printf("\ntesting alignment ...\n");
 
     char buf[BUFSIZE];
-    uint64 hash[8];
+    uint64_t hash[8];
     for (int i=0; i<BUFSIZE-16; ++i)
     {
         for (int j=0; j<8; ++j)
@@ -265,7 +263,7 @@ bool SpookyV2TestAlignment()
                 buf[j+k] = k;
             }
             buf[j+i+1] = (char)i+j;
-            hash[j] = SpookyHash::Hash64((const void *)(buf+j+1), i, 0);
+            hash[j] = SpookyV2Hash64((const void *)(buf+j+1), i, 0);
         }
         for (int j=1; j<8; ++j)
         {
@@ -288,8 +286,8 @@ bool SpookyV2TestDeltas(int seed)
 {
     printf("\nall 1 or 2 bit input deltas get %d tries to flip every output bit ...\n", TRIES);
 
-    Random random;
-    random.Init((uint64)seed);
+    struct RandomContext random;
+    RandomInit(&random, (uint64_t)seed);
     
     // for messages 0..BUFSIZE-1 bytes
     for (int h=0; h<BUFSIZE; ++h)
@@ -301,8 +299,8 @@ bool SpookyV2TestDeltas(int seed)
             // second bit to set, or don't have a second bit
             for (int j=0; j<=i; ++j)
             {
-                uint64 measure[MEASURES][2];
-                uint64 counter[MEASURES][2];
+                uint64_t measure[MEASURES][2];
+                uint64_t counter[MEASURES][2];
                 for (int l=0; l<2; ++l)
                 {
                     for (int m=0; m<MEASURES; ++m)
@@ -315,20 +313,20 @@ bool SpookyV2TestDeltas(int seed)
                 int k;
                 for (k=0; k<TRIES; ++k)
                 {
-                    uint8 buf1[BUFSIZE];
-                    uint8 buf2[BUFSIZE];
+                    uint8_t buf1[BUFSIZE];
+                    uint8_t buf2[BUFSIZE];
                     int done = 1;
                     for (int l=0; l<h; ++l)
                     {
-                        buf1[l] = buf2[l] = random.Value();
+                        buf1[l] = buf2[l] = RandomValue(&random);
                     }
                     buf1[i/8] ^= (1 << (i%8));
                     if (j != i)
                     {
                         buf1[j/8] ^= (1 << (j%8));
                     }
-                    SpookyHash::Hash128(buf1, h, &measure[0][0], &measure[0][1]);
-                    SpookyHash::Hash128(buf2, h, &measure[1][0], &measure[1][1]);
+                    SpookyV2Hash128(buf1, h, &measure[0][0], &measure[0][1]);
+                    SpookyV2Hash128(buf2, h, &measure[1][0], &measure[1][1]);
                     for (int l=0; l<2; ++l) {
                         measure[2][l] = measure[0][l] ^ measure[1][l];
                         measure[3][l] = ~(measure[0][l] ^ measure[1][l]);
@@ -379,20 +377,20 @@ bool SpookyV2TestPieces()
     }
     for (int i=0; i<BUFSIZE; ++i)
     {
-        uint64 a,b,c,d,seed1=1,seed2=2;
-        SpookyHash state;
+        uint64_t a,b,c,d,seed1=1,seed2=2;
+        SpookyV2Context state;
         
         // all as one call
         a = seed1;
         b = seed2;
-        SpookyHash::Hash128(buf, i, &a, &b);
+        SpookyV2Hash128(buf, i, &a, &b);
         
         // all as one piece
 	c = 0xdeadbeefdeadbeef;
 	d = 0xbaceba11baceba11;
-        state.Init(seed1, seed2);
-        state.Update(buf, i);
-        state.Final(&c, &d);
+        SpookyV2Init(&state, seed1, seed2);
+        SpookyV2Update(&state, buf, i);
+        SpookyV2Final(&state, &c, &d);
         
         if (a != c)
         {
@@ -410,10 +408,10 @@ bool SpookyV2TestPieces()
         {
             c = seed1;
             d = seed2;
-            state.Init(c, d);
-            state.Update(&buf[0], j);
-            state.Update(&buf[j], i-j);
-            state.Final(&c, &d);
+            SpookyV2Init(&state, c, d);
+            SpookyV2Update(&state, &buf[0], j);
+            SpookyV2Update(&state, &buf[j], i-j);
+            SpookyV2Final(&state, &c, &d);
             if (a != c)
             {
                 printf("wrong a %d %d: %.16llx %.16llx\n", j, i, a,c);
