@@ -45,7 +45,6 @@
 //- (void)feedContentsOfFile:(NSString *)filepath;
 
 + (Class)defaultDigestClass;
-+ (void)setDefaultDigestClass:(Class)defaultDigestClass;
 
 @end
 

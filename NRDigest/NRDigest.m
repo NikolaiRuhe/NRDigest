@@ -9,6 +9,10 @@
 #import "NRDigest.h"
 #import <CommonCrypto/CommonDigest.h>
 
+#if ! defined(NR_DEFAULT_DIGEST_CLASS)
+	#define NR_DEFAULT_DIGEST_CLASS NRMutableMD5Digest
+#endif
+
 // NOTE: consider support of more digest algorithms:
 // - other md* and sha* variants.
 // - CityHash http://en.wikipedia.org/wiki/CityHash
@@ -146,7 +150,7 @@
 	}                                                                            \
 	return self;                                                                 \
 }                                                                                \
-- (const void *)bytes { return _bytes; }                                      \
+- (const void *)bytes { return _bytes; }                                         \
 - (NSUInteger)digestSize { return bytesize; }                                    \
 @end
 
@@ -223,20 +227,16 @@ NR_CONSTANT_DIGEST(32) // 256 bit key: NRConstant32ByteDigest
 	__builtin_unreachable();
 }
 
-static __unsafe_unretained Class _defaultDigestClass;
-
 + (Class)defaultDigestClass
 {
-	if (_defaultDigestClass != nil)
-		return _defaultDigestClass;
-	return [NRMutableMD5Digest class];
-}
+	static __unsafe_unretained Class defaultDigestClass;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		NSCAssert([[NR_DEFAULT_DIGEST_CLASS class] isSubclassOfClass:[NRMutableDigest class]], @"default digest class not mutable");
+		defaultDigestClass = [NR_DEFAULT_DIGEST_CLASS class];
+	});
 
-+ (void)setDefaultDigestClass:(Class)defaultDigestClass
-{
-	NSAssert(defaultDigestClass == nil || [defaultDigestClass isKindOfClass:[NRMutableDigest class]], @"bad default digest class");
-
-	_defaultDigestClass = defaultDigestClass;
+	return defaultDigestClass;
 }
 
 - (id)initWithPrototype:(NRMutableDigest *)prototype
