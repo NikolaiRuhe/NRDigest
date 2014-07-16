@@ -278,7 +278,8 @@ NR_CONSTANT_DIGEST(32) // 256 bit key: NRConstant32ByteDigest
 	if (encoding == NSUnicodeStringEncoding) {
 		const UniChar *characters = CFStringGetCharactersPtr((__bridge CFStringRef)string);
 		if (characters != NULL) {
-			[self feedBytes:characters length:(NSUInteger)CFStringGetLength((__bridge CFStringRef)string)];
+			NSUInteger length = sizeof(UniChar) * CFStringGetLength((__bridge CFStringRef)string);
+			[self feedBytes:characters length:length];
 			return;
 		}
 	}
